@@ -6,7 +6,6 @@ class Crawler {
 
     private $baseUrl;
     private $indexUrl;
-
     //Product Properties
     private $productCatContainer;
 
@@ -15,6 +14,9 @@ class Crawler {
 
     // Product Cost DOM Properties
     private $productCostNode;
+
+    //Product URL DOM Properties
+    private $productUrlNode;
 
     //Product Name DOM Properties
     private $productNameNode;
@@ -51,7 +53,9 @@ class Crawler {
         foreach ($productInfoNodes as $productInfoNode){
             $var_name = $this->_getProductName($productInfoNode);
             $var_cost = $this->_getProductCost($productInfoNode);
-            $product = new Product($var_name, $var_cost);
+            $var_url = $this->_getProductUrl($productInfoNode);
+            $product = new Product($var_name, $var_cost, $var_url);
+
             $product->setCategory($category);
             $objProduct[] = $product;
         }
@@ -67,6 +71,11 @@ class Crawler {
     private function _getProductCost($productInfoNode){
         $priceNode = $this->_getParentNodes([$productInfoNode], $this->productCostNode);
         return $priceNode[0]->nodeValue;
+    }
+
+    private function _getProductUrl($productInfoNode){
+        $UrlNode = $this->_getElementNodes([$productInfoNode], $this->productUrlNode);
+        return $UrlNode[0]->getAttribute($this->productUrlNode['attribute']);
     }
 
 
@@ -108,7 +117,6 @@ class Crawler {
             foreach ($node->childNodes as $childNode){
                 switch ($childNode->nodeType){
                     case XML_ELEMENT_NODE:
-                        if ($this->debug == 2){var_dump($childNode);}
                         if (
                             $childNode->nodeName == $parent['tag']
                             &&
@@ -208,7 +216,7 @@ class Crawler {
         $categories = [];
         foreach ($nodes as $node){
             if ($node->nodeValue != null){
-                $categories [] = new Category($node->nodeValue, $this->baseUrl . $node->getAttribute($this->categoryUrlAttr));
+                $categories [] = new Category($node->nodeValue, $node->getAttribute($this->categoryUrlAttr));
             }
         }
         return $categories;
@@ -226,6 +234,7 @@ class Crawler {
                             <td> Category </td>
                             <td> Category URL </td>
                             <td> Product Name </td>
+                            <td> Product Url </td>
                             <td> Product Cost </td>
                         </thead>
                         <tbody>';
@@ -234,6 +243,7 @@ class Crawler {
                                 echo '<td>'.$product->getCategory()->getCategoryName().'</td>';
                                 echo '<td>'.$product->getCategory()->getCategoryUrl().'</td>';
                                 echo '<td>'.$product->getName().'</td>';
+                                echo '<td>'.$product->getUrl().'</td>';
                                 echo '<td>'.$product->getCost().'</td>';
                                 echo '</tr>';
                             }
@@ -246,13 +256,11 @@ class Crawler {
     public function execute(){
         $products = [];
         $categories = $this->_getCategories();
-//            $i = 0;
+
         foreach ($categories as $categoryObj){
             $catalogueUrl = $this->baseUrl . $categoryObj->getCategoryUrl();
             $products = array_merge($products, $this->_fetchProducts($catalogueUrl, $categoryObj));
-//            if ($i == 4)
-//                break;
-//            $i = $i + 1;
+//            break;
         }
 
         $this->_printResult($products);

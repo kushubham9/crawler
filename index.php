@@ -16,6 +16,7 @@ $config = [
     'productInfoNode' => ['tag'=>'div', 'class'=>'product-info-inner'],
     'productCostNode' => ['tag'=>'div', 'class'=>'prod-price', 'parent' => ['tag' => 'div', 'class'=>'price']],
     'productNameNode' => ['tag'=>'h3','parent'=> ['tag'=>'a']],
+    'productUrlNode' => ['tag'=>'a', 'attribute' => 'href']
 ];
 
 $crawler = new Crawler($indexUrl, $config);

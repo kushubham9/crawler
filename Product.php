@@ -10,18 +10,37 @@ class Product
 {
     private $name;
     private $cost;
+    private $url;
     private $category;
 
 
-    function __construct($name, $cost, array $addRecord = [])
+    function __construct($name, $cost, $url, array $addRecord = [])
     {
         $this->name = $name;
         $this->cost = $cost;
+        $this->url = $url;
 
         foreach ($addRecord as $recordName => $recordValue){
             $this->recordName = $recordValue;
         }
     }
+
+    /**
+     * @return mixed
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param mixed $url
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+    }
+
 
     /**
      * @return mixed
